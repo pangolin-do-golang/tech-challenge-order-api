@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"github.com/pangolin-do-golang/tech-challenge/internal/errutil"
+	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/errutil"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/pangolin-do-golang/tech-challenge/internal/core/order"
+	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/core/order"
 )
 
 type OrderController struct {

@@ -3,7 +3,7 @@ package order
 import (
 	"errors"
 	"github.com/google/uuid"
-	"github.com/pangolin-do-golang/tech-challenge/internal/errutil"
+	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/errutil"
 )
 
 type Service struct {

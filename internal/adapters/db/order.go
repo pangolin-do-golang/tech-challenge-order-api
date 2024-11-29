@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/pangolin-do-golang/tech-challenge/internal/core/order"
-	"github.com/pangolin-do-golang/tech-challenge/internal/errutil"
+	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/core/order"
+	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/errutil"
 	"gorm.io/gorm"
 )
 

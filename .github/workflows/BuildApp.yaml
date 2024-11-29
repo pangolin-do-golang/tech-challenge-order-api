@@ -32,8 +32,8 @@ jobs:
           SHA: ${{ steps.short-sha.outputs.sha }}
         with:
           args: >
-            -Dsonar.organization=pangolin-do-golang
-            -Dsonar.projectKey=pangolin-do-golang_tech-challenge 
+            -Dsonar.organization=pangolin-golang
+            -Dsonar.projectKey=pangolin-do-golang_tech-challenge-order-api 
             -Dsonar.projectVersion=${{ env.SHA }}
             -Dsonar.qualitygate.wait=true
             -Dsonar.verbose=true
