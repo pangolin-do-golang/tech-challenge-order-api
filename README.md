@@ -20,6 +20,12 @@ Execute
 go mod tidy
 ```
 
+## Run tests
+
+```shell
+go test -cover ./...
+```
+
 ## Defining Envs
 
 To correctly use the project, it is necessary to define a .env file, with the values for the envs:
