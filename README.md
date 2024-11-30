@@ -127,7 +127,7 @@ The order of execution is:
 You can forward the port with the following command:
 
 ```bash
-kubectl port-forward svc/tech-challenge-service 4000:80 -n dev
+kubectl port-forward svc/tech-challenge-order-api-service 4000:80 -n dev
 ```
 
 ### Kubernates Architecture
