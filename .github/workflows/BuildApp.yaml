@@ -48,7 +48,7 @@ jobs:
             -Dsonar.language=go
             -Dsonar.qualitygate.wait=true
             -Dsonar.go.coverage.reportPaths=./coverage.out
-            -Dsonar.tests=./internal/
+            -Dsonar.go.tests.reportPaths=./internal/
             -Dsonar.verbose=true
 
       - name: Login to GitHub Container Registry
