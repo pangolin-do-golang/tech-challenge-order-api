@@ -31,7 +31,7 @@ jobs:
       - name: Build And Test
         shell: bash
         run: |
-          go test -cover ./internal/... -coverprofile coverage.out
+          go test -race -cover -json ./internal/... -coverprofile=coverage.json 
       
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
@@ -47,7 +47,7 @@ jobs:
             -Dsonar.projectVersion=${{ env.SHA }}
             -Dsonar.language=go
             -Dsonar.qualitygate.wait=true
-            -Dsonar.coverageReportPaths=coverage.out
+            -Dsonar.go.coverage.reportPaths=./coverage.json
             -Dsonar.tests=./internal/
             -Dsonar.verbose=true
 
