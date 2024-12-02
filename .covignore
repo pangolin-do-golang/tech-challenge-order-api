@@ -1,6 +1,4 @@
 **_mock.go
 mocks/
 docs/
-internal/adapters/db/
-internal/adapters/rest/server/
 cmd/

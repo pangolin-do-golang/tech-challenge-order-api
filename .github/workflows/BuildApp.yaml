@@ -36,6 +36,7 @@ jobs:
             -Dsonar.projectKey=pangolin-do-golang_tech-challenge-order-api 
             -Dsonar.projectVersion=${{ env.SHA }}
             -Dsonar.qualitygate.wait=true
+            -Dsonar.tests=internal/
             -Dsonar.verbose=true
 
       - name: Login to GitHub Container Registry
