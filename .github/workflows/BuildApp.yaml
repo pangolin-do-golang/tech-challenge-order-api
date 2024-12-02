@@ -23,7 +23,22 @@ jobs:
         id: short-sha
         with:
           length: 7
+      
+      - name: Setup GoLang
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.23.3'
 
+      - name: Build And Test
+        shell: bash
+        run: |
+          go test ./internal/... -coverprofile=./cov.out
+
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: '-no-fail -fmt=sonarqube -out report.json ./...'
+      
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -37,6 +52,7 @@ jobs:
             -Dsonar.projectVersion=${{ env.SHA }}
             -Dsonar.qualitygate.wait=true
             -Dsonar.tests=internal/
+            -Dsonar.go.coverage.reportPaths=report.json
             -Dsonar.verbose=true
 
       - name: Login to GitHub Container Registry

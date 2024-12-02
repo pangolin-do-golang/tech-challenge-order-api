@@ -21,7 +21,6 @@ type OrderPostgres struct {
 	TotalAmount float64   `gorm:"total_amount"`
 	Status      string    `gorm:"status"`
 	Customer    string    `gorm:"customer_id"`
-	Products    []string  `gorm:"product_id"`
 }
 
 func (op OrderPostgres) TableName() string {

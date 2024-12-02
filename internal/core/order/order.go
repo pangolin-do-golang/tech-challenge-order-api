@@ -73,7 +73,6 @@ type IOrderService interface {
 
 type IOrderProductRepository interface {
 	Create(ctx context.Context, orderID uuid.UUID, product *Product) error
-	GetByOrderID(ctx context.Context, orderID uuid.UUID) ([]*Product, error)
 }
 
 type IOrderRepository interface {
