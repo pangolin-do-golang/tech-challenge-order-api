@@ -32,7 +32,9 @@ jobs:
       - name: Build And Test
         shell: bash
         run: |
-          go test ./internal/... -covermode=atomic -coverprofile=./cov.out
+          go test ./internal/... -coverprofile=./cov.out
+          go get github.com/securego/gosec/cmd/gosec
+          gosec -no-fail -fmt=sonarqube -out report.json ./.
         
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
@@ -48,6 +50,7 @@ jobs:
             -Dsonar.qualitygate.wait=true
             -Dsonar.tests=internal/
             -Dsonar.go.coverage.reportPaths=./cov.out
+            -Dsonar.externalIssuesReportPaths=report.json
             -Dsonar.verbose=true
 
       - name: Login to GitHub Container Registry
