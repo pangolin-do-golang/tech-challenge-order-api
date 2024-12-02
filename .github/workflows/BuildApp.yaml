@@ -47,7 +47,6 @@ jobs:
             -Dsonar.projectVersion=${{ env.SHA }}
             -Dsonar.language=go
             -Dsonar.qualitygate.wait=true
-            # -Dsonar.tests=internal/
             -Dsonar.go.coverage.reportPaths=./coverage.out
             -Dsonar.verbose=true
 
