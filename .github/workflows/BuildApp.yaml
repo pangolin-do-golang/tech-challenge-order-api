@@ -48,6 +48,7 @@ jobs:
             -Dsonar.language=go
             -Dsonar.qualitygate.wait=true
             -Dsonar.go.coverage.reportPaths=./coverage.out
+            -Dsonar.test.exclusions=cmd/*, assets/*, docs/*, mocks/*
             -Dsonar.verbose=true
 
       - name: Login to GitHub Container Registry
