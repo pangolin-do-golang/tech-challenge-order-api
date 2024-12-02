@@ -52,8 +52,7 @@ jobs:
             -Dsonar.projectVersion=${{ env.SHA }}
             -Dsonar.qualitygate.wait=true
             -Dsonar.tests=internal/
-            -Dsonar.go.coverage.reportPaths=./cov.out
-            -Dsonar.externalIssuesReportPaths=report.json
+            -Dsonar.go.coverage.reportPaths=report.json
             -Dsonar.verbose=true
 
       - name: Login to GitHub Container Registry
