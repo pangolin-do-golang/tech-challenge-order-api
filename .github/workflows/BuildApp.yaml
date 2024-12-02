@@ -32,12 +32,7 @@ jobs:
       - name: Build And Test
         shell: bash
         run: |
-          go test ./internal/... -coverprofile=./cov.out
-
-      - name: Run Gosec Security Scanner
-        uses: securego/gosec@master
-        with:
-          args: '-no-fail -fmt=sonarqube -out report.json ./...'
+          go test -cover ./internal/... -coverprofile=coverage.out 
       
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
@@ -50,9 +45,10 @@ jobs:
             -Dsonar.organization=pangolin-golang
             -Dsonar.projectKey=pangolin-do-golang_tech-challenge-order-api 
             -Dsonar.projectVersion=${{ env.SHA }}
+            -Dsonar.language=go
             -Dsonar.qualitygate.wait=true
             -Dsonar.tests=internal/
-            -Dsonar.go.coverage.reportPaths=report.json
+            -Dsonar.go.coverage.reportPaths=coverage.out
             -Dsonar.verbose=true
 
       - name: Login to GitHub Container Registry
