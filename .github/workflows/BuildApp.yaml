@@ -32,7 +32,8 @@ jobs:
       - name: Build And Test
         shell: bash
         run: |
-          make test ./internal/... #-coverprofile=./cov.out
+          make test 
+          #./internal/... -coverprofile=./cov.out
 
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
