@@ -44,8 +44,7 @@ jobs:
           args: >            
             -Dsonar.projectVersion=${{ env.SHA }}
             -Dsonar.language=go
-            -Dsonar.qualitygate.wait=true            
-            -Dsonar.verbose=true
+            -Dsonar.qualitygate.wait=true                        
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
