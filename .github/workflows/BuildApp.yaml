@@ -6,8 +6,7 @@ on:
     branches:
       - main
   pull_request:
-    branches:
-      - main
+    types: [opened, synchronize, reopened]
 
 
 jobs:
@@ -48,7 +47,7 @@ jobs:
             -Dsonar.projectVersion=${{ env.SHA }}
             -Dsonar.language=go
             -Dsonar.qualitygate.wait=true
-            -Dsonar.tests=internal/
+            # -Dsonar.tests=internal/
             -Dsonar.go.coverage.reportPaths=./coverage.out
             -Dsonar.verbose=true
 
