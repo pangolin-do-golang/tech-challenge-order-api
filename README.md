@@ -35,7 +35,7 @@ To correctly use the project, it is necessary to define a .env file, with the va
 * DB_HOST 
 * DB_NAME 
 * DB_PORT
-* *CART_SERVICE_URL
+* CART_SERVICE_URL
 
 We recommend using for development the following values:
 
