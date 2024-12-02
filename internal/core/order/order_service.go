@@ -1,18 +1,25 @@
 package order
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
+	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/core/cart"
 	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/errutil"
 )
 
 type Service struct {
-	OrderRepository IOrderRepository
+	OrderRepository        IOrderRepository
+	OrderProductRepository IOrderProductRepository
+	CartService            cart.Service
 }
 
-func NewOrderService(repo IOrderRepository) IOrderService {
+func NewOrderService(repo IOrderRepository, orderProductRepository IOrderProductRepository, cartService *cart.Service) IOrderService {
 	return &Service{
-		OrderRepository: repo,
+		OrderRepository:        repo,
+		OrderProductRepository: orderProductRepository,
+		CartService:            *cartService,
 	}
 }
 
@@ -64,64 +71,71 @@ func (s *Service) Update(order *Order) (*Order, error) {
 }
 
 func (s *Service) Create(clientID uuid.UUID) (*Order, error) {
-	// TODO: implementar pegada aos microserviços
-	/*
-			c, err := s.CartService.GetFullCart(clientID)
+
+	c, err := s.CartService.GetFullCart(clientID)
+	if err != nil {
+		return nil, err
+	}
+
+	if c == nil {
+		return nil, fmt.Errorf("cart not found")
+	}
+
+	if len(c.Products) == 0 {
+		return nil, fmt.Errorf("empty cart")
+	}
+
+	fmt.Println(c)
+
+	order := &Order{
+		ClientID: clientID,
+		Status:   StatusCreated,
+	}
+
+	o, err := s.OrderRepository.Create(order)
+	if err != nil {
+		fmt.Errorf("Error saving order")
+		return nil, err
+	}
+
+	var total float64
+	for _, p := range c.Products {
+		stockProduct, err := s.CartService.GetProductByID(p.ProductID)
 		if err != nil {
 			return nil, err
 		}
 
-		if len(c.Products) == 0 {
-			return nil, fmt.Errorf("empty cart")
+		productTotal := stockProduct.Price * float64(p.Quantity)
+
+		fmt.Println(productTotal)
+
+		orderProduct := &Product{
+			ClientID:  clientID,
+			ProductID: p.ProductID,
+			Quantity:  p.Quantity,
+			Comments:  p.Comments,
+			Total:     productTotal,
 		}
 
-		order := &Order{
-			ClientID: clientID,
-			Status:   StatusCreated,
-		}
-
-		o, err := s.OrderRepository.Create(order)
+		err = s.OrderProductRepository.Create(context.Background(), o.ID, orderProduct)
 		if err != nil {
+			fmt.Errorf("Error saving order product")
 			return nil, err
 		}
 
-		var total float64
-		for _, p := range c.Products {
-			stockProduct, err := s.ProductService.GetByID(p.ProductID)
-			if err != nil {
-				return nil, err
-			}
+		total += productTotal
+	}
 
-			productTotal := stockProduct.Price * float64(p.Quantity)
+	o.TotalAmount = total
+	o.Status = StatusPending
+	err = s.OrderRepository.Update(o)
+	if err != nil {
+		return nil, err
+	}
 
-			orderProduct := &Product{
-				ClientID:  clientID,
-				ProductID: p.ProductID,
-				Quantity:  p.Quantity,
-				Comments:  p.Comments,
-				Total:     productTotal,
-			}
+	if err = s.CartService.Cleanup(clientID); err != nil {
+		return nil, err
+	}
 
-			err = s.OrderProductRepository.Create(context.Background(), o.ID, orderProduct)
-			if err != nil {
-				return nil, err
-			}
-
-			total += productTotal
-		}
-
-		o.TotalAmount = total
-		o.Status = StatusPending
-		err = s.OrderRepository.Update(o)
-		if err != nil {
-			return nil, err
-		}
-
-		if err = s.CartService.Cleanup(clientID); err != nil {
-			return nil, err
-		}
-
-		return o, nil
-	*/
-	return &Order{}, nil
+	return o, nil
 }

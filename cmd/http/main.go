@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/core/cart"
 	"log"
 	"os"
 
@@ -26,8 +27,12 @@ func main() {
 		panic(err)
 	}
 
+	orderProductsRepository := dbAdapter.NewPostgresOrderProductsRepository(db)
+
+	cartService := cart.NewCartService()
+
 	orderRepository := dbAdapter.NewPostgresOrderRepository(db)
-	orderService := order.NewOrderService(orderRepository)
+	orderService := order.NewOrderService(orderRepository, orderProductsRepository, cartService)
 
 	restServer := server.NewRestServer(&server.RestServerOptions{
 		OrderService: orderService,
@@ -52,6 +57,7 @@ func initDb() (*gorm.DB, error) {
 
 	err = db.AutoMigrate(
 		&dbAdapter.OrderPostgres{},
+		&dbAdapter.OrderProductPostgres{},
 	)
 	if err != nil {
 		log.Fatalln(err)
