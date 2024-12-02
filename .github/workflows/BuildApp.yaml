@@ -6,8 +6,7 @@ on:
     branches:
       - main
   pull_request:
-    branches:
-      - main
+    types: [opened, synchronize, reopened]
 
 
 jobs:
@@ -32,7 +31,7 @@ jobs:
       - name: Build And Test
         shell: bash
         run: |
-          go test -cover ./internal/... -coverprofile=./coverage.out -coverpkg=./internal/...
+          go test -race -cover -json ./internal/... -coverprofile=coverage.json 
       
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
@@ -48,8 +47,8 @@ jobs:
             -Dsonar.projectVersion=${{ env.SHA }}
             -Dsonar.language=go
             -Dsonar.qualitygate.wait=true
-            -Dsonar.tests=internal/
-            -Dsonar.go.coverage.reportPaths=./coverage.out
+            -Dsonar.go.coverage.reportPaths=./coverage.json
+            -Dsonar.tests=./internal/
             -Dsonar.verbose=true
 
       - name: Login to GitHub Container Registry
