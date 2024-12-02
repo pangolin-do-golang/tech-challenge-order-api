@@ -32,13 +32,12 @@ jobs:
       - name: Build And Test
         shell: bash
         run: |
-          make test 
-          #./internal/... -coverprofile=./cov.out
+          go test -coverprofile=./cov.out ./internal/... 
 
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
-          args: '-no-fail -fmt=sonarqube -out report.json ./...'
+          args: -no-fail -fmt=sonarqube -out report.json internal/...
       
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
@@ -53,7 +52,8 @@ jobs:
             -Dsonar.projectVersion=${{ env.SHA }}
             -Dsonar.qualitygate.wait=true
             -Dsonar.tests=internal/
-            -Dsonar.go.coverage.reportPaths=report.json
+            -Dsonar.go.coverage.reportPaths=cov.out
+            -Dsonar.externalIssuesReportPaths=report.json
             -Dsonar.verbose=true
 
       - name: Login to GitHub Container Registry
