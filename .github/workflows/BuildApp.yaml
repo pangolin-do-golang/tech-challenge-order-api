@@ -31,7 +31,7 @@ jobs:
       - name: Build And Test
         shell: bash
         run: |
-          go test -race -cover -json ./internal/... -coverprofile=coverage.json 
+          go test -race -short -cover ./internal/... -coverprofile=coverage.out
       
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
@@ -41,14 +41,10 @@ jobs:
           SHA: ${{ steps.short-sha.outputs.sha }}
         with:
           projectBaseDir: ./
-          args: >
-            -Dsonar.organization=pangolin-golang
-            -Dsonar.projectKey=pangolin-do-golang_tech-challenge-order-api 
+          args: >            
             -Dsonar.projectVersion=${{ env.SHA }}
             -Dsonar.language=go
-            -Dsonar.qualitygate.wait=true
-            -Dsonar.go.coverage.reportPaths=./coverage.json
-            -Dsonar.tests=./internal/
+            -Dsonar.qualitygate.wait=true            
             -Dsonar.verbose=true
 
       - name: Login to GitHub Container Registry
