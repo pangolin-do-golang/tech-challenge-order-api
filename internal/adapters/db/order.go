@@ -12,7 +12,7 @@ import (
 )
 
 type PostgresOrderRepository struct {
-	db *gorm.DB
+	db IDB
 }
 
 type OrderPostgres struct {
@@ -27,7 +27,7 @@ func (op OrderPostgres) TableName() string {
 	return "order"
 }
 
-func NewPostgresOrderRepository(db *gorm.DB) order.IOrderRepository {
+func NewPostgresOrderRepository(db IDB) order.IOrderRepository {
 	return &PostgresOrderRepository{db: db}
 }
 
@@ -80,14 +80,23 @@ func (r *PostgresOrderRepository) Get(id uuid.UUID) (*order.Order, error) {
 func (r *PostgresOrderRepository) GetAll() ([]order.Order, error) {
 	var records []OrderPostgres
 
-	err := r.db.Raw(buildGetAllQuery()).Scan(&records).Error
-
+	rows, err := r.db.Raw(buildGetAllQuery()).Rows()
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, errutil.ErrRecordNotFound
 	}
 
 	if err != nil {
 		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var record OrderPostgres
+		if err := r.db.ScanRows(rows, &record); err != nil {
+			return nil, err
+		}
+		records = append(records, record)
 	}
 
 	parsedOrders := make([]order.Order, len(records))
