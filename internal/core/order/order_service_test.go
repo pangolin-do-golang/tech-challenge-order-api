@@ -2,6 +2,10 @@ package order_test
 
 import (
 	"errors"
+	"reflect"
+	"testing"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/core/cart"
 	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/core/order"
@@ -9,9 +13,6 @@ import (
 	"github.com/pangolin-do-golang/tech-challenge-order-api/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"reflect"
-	"testing"
-	"time"
 )
 
 func TestService_Get(t *testing.T) {
@@ -610,10 +611,10 @@ func TestCreate_EmptyCart(t *testing.T) {
 		CartService: mockCartService,
 	}
 
-	o, err := service.Create(clientID)
+	order, err := service.Create(clientID)
 
 	assert.Error(t, err)
-	assert.Nil(t, o)
+	assert.Nil(t, order)
 	assert.Equal(t, "empty cart", err.Error())
 
 	mockCartService.AssertExpectations(t)
