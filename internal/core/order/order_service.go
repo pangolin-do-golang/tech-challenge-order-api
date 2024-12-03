@@ -12,14 +12,14 @@ import (
 type Service struct {
 	OrderRepository        IOrderRepository
 	OrderProductRepository IOrderProductRepository
-	CartService            cart.Service
+	CartService            cart.ICartService
 }
 
-func NewOrderService(repo IOrderRepository, orderProductRepository IOrderProductRepository, cartService *cart.Service) IOrderService {
+func NewOrderService(repo IOrderRepository, orderProductRepository IOrderProductRepository, cartService cart.ICartService) IOrderService {
 	return &Service{
 		OrderRepository:        repo,
 		OrderProductRepository: orderProductRepository,
-		CartService:            *cartService,
+		CartService:            cartService,
 	}
 }
 
@@ -71,8 +71,8 @@ func (s *Service) Update(order *Order) (*Order, error) {
 }
 
 func (s *Service) Create(clientID uuid.UUID) (*Order, error) {
-
 	c, err := s.CartService.GetFullCart(clientID)
+
 	if err != nil {
 		return nil, err
 	}
@@ -84,8 +84,6 @@ func (s *Service) Create(clientID uuid.UUID) (*Order, error) {
 	if len(c.Products) == 0 {
 		return nil, fmt.Errorf("empty cart")
 	}
-
-	fmt.Println(c)
 
 	order := &Order{
 		ClientID: clientID,
@@ -106,8 +104,6 @@ func (s *Service) Create(clientID uuid.UUID) (*Order, error) {
 		}
 
 		productTotal := stockProduct.Price * float64(p.Quantity)
-
-		fmt.Println(productTotal)
 
 		orderProduct := &Product{
 			ClientID:  clientID,
