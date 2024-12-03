@@ -71,7 +71,6 @@ func (s *Service) Update(order *Order) (*Order, error) {
 }
 
 func (s *Service) Create(clientID uuid.UUID) (*Order, error) {
-
 	c, err := s.CartService.GetFullCart(clientID)
 
 	if err != nil {
