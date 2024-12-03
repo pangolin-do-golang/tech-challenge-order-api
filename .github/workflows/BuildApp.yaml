@@ -6,8 +6,7 @@ on:
     branches:
       - main
   pull_request:
-    branches:
-      - main
+    types: [opened, synchronize, reopened]
 
 
 jobs:
@@ -23,7 +22,17 @@ jobs:
         id: short-sha
         with:
           length: 7
+      
+      - name: Setup GoLang
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.23.3'
 
+      - name: Build And Test
+        shell: bash
+        run: |
+          go test -race -short -cover ./internal/... -coverprofile=coverage.out
+      
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -31,13 +40,11 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           SHA: ${{ steps.short-sha.outputs.sha }}
         with:
-          args: >
-            -Dsonar.organization=pangolin-golang
-            -Dsonar.projectKey=pangolin-do-golang_tech-challenge-order-api 
+          projectBaseDir: ./
+          args: >            
             -Dsonar.projectVersion=${{ env.SHA }}
-            -Dsonar.qualitygate.wait=true
-            -Dsonar.tests=internal/
-            -Dsonar.verbose=true
+            -Dsonar.language=go
+            -Dsonar.qualitygate.wait=true                        
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
