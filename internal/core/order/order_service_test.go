@@ -3,9 +3,11 @@ package order_test
 import (
 	"errors"
 	"github.com/google/uuid"
+	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/core/cart"
 	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/core/order"
 	"github.com/pangolin-do-golang/tech-challenge-order-api/internal/errutil"
 	"github.com/pangolin-do-golang/tech-challenge-order-api/mocks"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"reflect"
 	"testing"
@@ -535,4 +537,84 @@ func TestService_Update(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCreate(t *testing.T) {
+	clientID := uuid.New()
+
+	mockCartService := new(mocks.ICartService)
+
+	mockCartService.On("GetFullCart", clientID).Return(&cart.Cart{
+		Products: []*cart.Product{
+			{ProductID: uuid.New(), Quantity: 1, Comments: "Test product"},
+		},
+	}, nil)
+	mockCartService.On("GetProductByID", mock.Anything).Return(&cart.Product{Price: 100.0}, nil)
+	mockCartService.On("Cleanup", clientID).Return(nil)
+
+	mockOrderRepo := new(mocks.IOrderRepository)
+	mockOrderRepo.On("Create", mock.Anything).Return(&order.Order{
+		ID:       uuid.New(),
+		ClientID: clientID,
+		Status:   order.StatusCreated,
+	}, nil)
+	mockOrderRepo.On("Update", mock.Anything).Return(nil)
+
+	mockOrderProductRepo := new(mocks.IOrderProductRepository)
+	mockOrderProductRepo.On("Create", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+	service := &order.Service{
+		CartService:            mockCartService,
+		OrderRepository:        mockOrderRepo,
+		OrderProductRepository: mockOrderProductRepo,
+	}
+
+	createdOrder, err := service.Create(clientID)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, createdOrder)
+	assert.Equal(t, order.StatusPending, createdOrder.Status)
+	assert.Equal(t, clientID, createdOrder.ClientID)
+
+	mockCartService.AssertExpectations(t)
+	mockOrderRepo.AssertExpectations(t)
+	mockOrderProductRepo.AssertExpectations(t)
+}
+
+func TestCreate_CartNotFound(t *testing.T) {
+	clientID := uuid.New()
+
+	mockCartService := new(mocks.ICartService)
+	mockCartService.On("GetFullCart", clientID).Return(nil, errors.New("cart not found"))
+
+	service := &order.Service{
+		CartService: mockCartService,
+	}
+
+	order, err := service.Create(clientID)
+
+	assert.Error(t, err)
+	assert.Nil(t, order)
+	assert.Equal(t, "cart not found", err.Error())
+
+	mockCartService.AssertExpectations(t)
+}
+
+func TestCreate_EmptyCart(t *testing.T) {
+	clientID := uuid.New()
+
+	mockCartService := new(mocks.ICartService)
+	mockCartService.On("GetFullCart", clientID).Return(&cart.Cart{Products: []*cart.Product{}}, nil)
+
+	service := &order.Service{
+		CartService: mockCartService,
+	}
+
+	o, err := service.Create(clientID)
+
+	assert.Error(t, err)
+	assert.Nil(t, o)
+	assert.Equal(t, "empty cart", err.Error())
+
+	mockCartService.AssertExpectations(t)
 }
