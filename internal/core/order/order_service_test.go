@@ -619,3 +619,33 @@ func TestCreate_EmptyCart(t *testing.T) {
 
 	mockCartService.AssertExpectations(t)
 }
+
+func TestCreate_ErrorSavingOrder(t *testing.T) {
+	clientID := uuid.New()
+
+	mockCartService := new(mocks.ICartService)
+
+	mockCartService.On("GetFullCart", clientID).Return(&cart.Cart{
+		Products: []*cart.Product{
+			{ProductID: uuid.New(), Quantity: 1, Comments: "Test product"},
+		},
+	}, nil)
+	mockCartService.On("GetProductByID", mock.Anything).Return(&cart.Product{Price: 100.0}, nil)
+	mockCartService.On("Cleanup", clientID).Return(nil)
+
+	mockOrderRepo := new(mocks.IOrderRepository)
+	mockOrderRepo.On("Create", mock.Anything).Return(nil, errors.New("error saving order"))
+	mockOrderProductRepo := new(mocks.IOrderProductRepository)
+
+	service := &order.Service{
+		CartService:            mockCartService,
+		OrderRepository:        mockOrderRepo,
+		OrderProductRepository: mockOrderProductRepo,
+	}
+
+	createdOrder, err := service.Create(clientID)
+
+	assert.Error(t, err)
+	assert.Equal(t, "error saving order", err.Error())
+	assert.Nil(t, createdOrder)
+}
